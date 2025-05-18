@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0
+      author: jcobfx
+      changes:
+        - modifyDataType:
+            tableName: users
+            columnName: username
+            newDataType: varchar(50)
+
+  - changeSet:
+      id: 1
+      author: jcobfx
+      changes:
+        - modifyDataType:
+            tableName: financial_records
+            columnName: category
+            newDataType: varchar(50)
+
+  - changeSet:
+      id: 2
+      author: jcobfx
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: users_roles
+            constraintName: fk_role_name
+        - modifyDataType:
+            tableName: users_roles
+            columnName: role_name
+            newDataType: varchar(20)
+        - modifyDataType:
+            tableName: roles
+            columnName: name
+            newDataType: varchar(20)
+        - addForeignKeyConstraint:
+            baseTableName: users_roles
+            baseColumnNames: role_name
+            referencedTableName: roles
+            referencedColumnNames: name
+            constraintName: fk_role_name
+            deferrable: false
+            initiallyDeferred: false
+            referencesUniqueColumn: false
+            validate: true

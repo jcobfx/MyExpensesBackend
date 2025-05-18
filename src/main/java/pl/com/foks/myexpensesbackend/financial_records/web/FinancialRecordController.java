@@ -1,0 +1,38 @@
+package pl.com.foks.myexpensesbackend.financial_records.web;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import pl.com.foks.myexpensesbackend.financial_records.app.FinancialRecordService;
+import pl.com.foks.myexpensesbackend.financial_records.domain.FinancialRecord;
+import pl.com.foks.myexpensesbackend.users.domain.User;
+
+import java.util.Set;
+
+@RestController
+@RequestMapping("/api/v1/financial-records")
+@RequiredArgsConstructor
+public class FinancialRecordController {
+    private final FinancialRecordService financialRecordService;
+
+    @GetMapping
+    public ResponseEntity<Set<FinancialRecord>> getFinancialRecords(@AuthenticationPrincipal User user) {
+        Set<FinancialRecord> financialRecords = financialRecordService.getFinancialRecords(user);
+        return ResponseEntity.ok(financialRecords);
+    }
+
+    @PutMapping
+    public ResponseEntity<String> createFinancialRecord(@AuthenticationPrincipal User user, @RequestBody FinancialRecord financialRecord) {
+        financialRecord.setUser(user);
+        FinancialRecord createdFinancialRecord = financialRecordService.createFinancialRecord(financialRecord);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdFinancialRecord.getUuid());
+    }
+
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<Void> deleteFinancialRecord(@AuthenticationPrincipal User user, @PathVariable String uuid) {
+        financialRecordService.deleteFinancialRecord(user, uuid);
+        return ResponseEntity.noContent().build();
+    }
+}

@@ -1,0 +1,82 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0
+      author: jcobfx
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: users_roles
+            constraintName: fk_user_id
+        - dropForeignKeyConstraint:
+            baseTableName: financial_records
+            constraintName: fk_user_id
+        - modifyDataType:
+            tableName: users
+            columnName: id
+            newDataType: bigint
+        - addAutoIncrement:
+            tableName: users
+            columnName: id
+            columnDataType: bigint
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: uuid
+                  type: uuid
+                  constraints:
+                    unique: true
+                    nullable: false
+
+  - changeSet:
+      id: 1
+      author: jcobfx
+      changes:
+        - modifyDataType:
+            tableName: users_roles
+            columnName: user_id
+            newDataType: bigint
+        - addForeignKeyConstraint:
+            baseTableName: users_roles
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_user_id
+
+  - changeSet:
+      id: 2
+      author: jcobfx
+      changes:
+        - modifyDataType:
+            tableName: financial_records
+            columnName: id
+            newDataType: bigint
+        - addAutoIncrement:
+            tableName: financial_records
+            columnName: id
+            columnDataType: bigint
+        - addColumn:
+            tableName: financial_records
+            columns:
+              - column:
+                  name: uuid
+                  type: uuid
+                  constraints:
+                    unique: true
+                    nullable: false
+        - modifyDataType:
+            tableName: financial_records
+            columnName: user_id
+            newDataType: bigint
+        - addForeignKeyConstraint:
+            baseTableName: financial_records
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_user_id
+        - dropPrimaryKey:
+            tableName: financial_records
+            constraintName: financial_records_pk
+        - addPrimaryKey:
+            tableName: financial_records
+            columnNames: id, user_id
+            constraintName: financial_records_pk

@@ -1,0 +1,128 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0
+      author: jcobfx
+      changes:
+        - createTable:
+            tableName: refresh_tokens
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: refresh_tokens_pk
+                    nullable: false
+                  autoIncrement: true
+
+              - column:
+                  name: token
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: refresh_tokens_token_key
+
+              - column:
+                  name: expiry_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_refresh_tokens_user_id
+                    references: users(id)
+
+  - changeSet:
+      id: 1
+      author: jcobfx
+      changes:
+        - modifyDataType:
+            tableName: users
+            columnName: uuid
+            newDataType: varchar(255)
+
+        - modifyDataType:
+            tableName: financial_records
+            columnName: uuid
+            newDataType: varchar(255)
+
+  - changeSet:
+      id: 2
+      author: jcobfx
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: users_roles
+            constraintName: fk_role_name
+        - dropPrimaryKey:
+            tableName: roles
+            constraintName: role_pk
+        - addPrimaryKey:
+            tableName: roles
+            constraintName: roles_pk
+            columnNames: name
+        - addForeignKeyConstraint:
+            baseTableName: users_roles
+            baseColumnNames: role_name
+            referencedTableName: roles
+            referencedColumnNames: name
+            constraintName: fk_role_name
+            deferrable: false
+            initiallyDeferred: false
+            referencesUniqueColumn: false
+
+        - dropForeignKeyConstraint:
+            baseTableName: users_roles
+            constraintName: fk_user_id
+        - dropForeignKeyConstraint:
+            baseTableName: financial_records
+            constraintName: fk_user_id
+        - dropForeignKeyConstraint:
+            baseTableName: refresh_tokens
+            constraintName: fk_refresh_tokens_user_id
+        - dropPrimaryKey:
+            tableName: users
+            constraintName: user_pk
+        - addPrimaryKey:
+            tableName: users
+            constraintName: users_pk
+            columnNames: id
+        - addForeignKeyConstraint:
+            baseTableName: users_roles
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_user_id
+            deferrable: false
+            initiallyDeferred: false
+            referencesUniqueColumn: false
+        - addForeignKeyConstraint:
+            baseTableName: financial_records
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_user_id
+            deferrable: false
+            initiallyDeferred: false
+            referencesUniqueColumn: false
+        - addForeignKeyConstraint:
+            baseTableName: refresh_tokens
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_refresh_tokens_user_id
+            deferrable: false
+            initiallyDeferred: false
+            referencesUniqueColumn: false
+
+        - dropPrimaryKey:
+            tableName: users_roles
+            constraintName: user_role_pk
+        - addPrimaryKey:
+            tableName: users_roles
+            constraintName: users_roles_pk
+            columnNames: user_id, role_name
