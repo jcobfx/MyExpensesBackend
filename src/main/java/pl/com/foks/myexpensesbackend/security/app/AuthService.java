@@ -35,7 +35,7 @@ public class AuthService {
             User user = (User) auth.getPrincipal();
             String token = jwtUtil.generateToken(user);
             String refreshToken = refreshTokenService.createRefreshToken(username).getToken();
-            return new AuthResponse(token, refreshToken);
+            return new AuthResponse(token, refreshToken, false);
         } else {
             throw new BadCredentialsException("Invalid username or password");
         }
@@ -66,7 +66,7 @@ public class AuthService {
                     String username = user.getUsername();
                     String token = jwtUtil.generateToken(user);
                     String refToken = refreshTokenService.createRefreshToken(username).getToken();
-                    return new AuthResponse(token, refToken);
+                    return new AuthResponse(token, refToken, true);
                 })
                 .orElseThrow(() -> new BadCredentialsException("Invalid refresh token"));
     }

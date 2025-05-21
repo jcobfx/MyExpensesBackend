@@ -11,7 +11,6 @@ import pl.com.foks.myexpensesbackend.security.app.AuthService;
 import pl.com.foks.myexpensesbackend.security.dto.AuthRequest;
 import pl.com.foks.myexpensesbackend.security.dto.AuthResponse;
 import pl.com.foks.myexpensesbackend.security.dto.RefreshRequest;
-import pl.com.foks.myexpensesbackend.users.domain.User;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -25,9 +24,10 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody AuthRequest authRequest) {
-        User registeredUser = authService.register(authRequest.username(), authRequest.password(), authRequest.email());
-        return ResponseEntity.status(HttpStatus.CREATED).body(registeredUser.getUuid());
+    public ResponseEntity<AuthResponse> register(@RequestBody AuthRequest authRequest) {
+        authService.register(authRequest.username(), authRequest.password(), authRequest.email());
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                authService.login(authRequest.username(), authRequest.password()));
     }
 
     @PostMapping("/refresh")
