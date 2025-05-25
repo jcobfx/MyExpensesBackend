@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.com.foks.myexpensesbackend.users.domain.User;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -30,7 +29,10 @@ public class FinancialRecord {
     private User user;
 
     @Column(nullable = false)
-    private BigDecimal value;
+    private String title;
+
+    @Column(nullable = false)
+    private int value;
 
     @Column(nullable = false)
     private String category;

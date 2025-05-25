@@ -1,5 +1,6 @@
 package pl.com.foks.myexpensesbackend.config;
 
+import io.jsonwebtoken.JwtException;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -16,8 +17,8 @@ import pl.com.foks.myexpensesbackend.users.domain.UserNotFoundException;
 @Log
 @Profile("local")
 public class GlobalExceptionHandler {
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<String> handleAuthenticationException(AuthenticationException e) {
+    @ExceptionHandler({AuthenticationException.class, JwtException.class})
+    public ResponseEntity<String> handleAuthenticationException(Exception e) {
         log.severe("Authentication error: " + e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication error: " + e.getMessage());
     }

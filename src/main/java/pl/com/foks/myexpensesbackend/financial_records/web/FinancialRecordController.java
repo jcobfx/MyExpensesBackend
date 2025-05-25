@@ -24,10 +24,11 @@ public class FinancialRecordController {
     }
 
     @PutMapping
-    public ResponseEntity<String> createFinancialRecord(@AuthenticationPrincipal User user, @RequestBody FinancialRecord financialRecord) {
+    public ResponseEntity<FinancialRecord> createFinancialRecord(@AuthenticationPrincipal User user,
+                                                                 @RequestBody FinancialRecord financialRecord) {
         financialRecord.setUser(user);
         FinancialRecord createdFinancialRecord = financialRecordService.createFinancialRecord(financialRecord);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdFinancialRecord.getUuid());
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdFinancialRecord);
     }
 
     @DeleteMapping("/{uuid}")

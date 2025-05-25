@@ -1,6 +1,7 @@
 package pl.com.foks.myexpensesbackend.security.infrastructure;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +28,7 @@ public class JwtUtil {
         Date expirationDate = new Date(now.getTime() + expiration * 60 * 1000);
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("uuid", user.getUuid());
+//        claims.put("uuid", user.getUuid());
         claims.put("roles", user.getRoles());
         return Jwts.builder()
                 .header().type("JWT")
@@ -57,7 +58,7 @@ public class JwtUtil {
         return extractClaims(token).getExpiration();
     }
 
-    public Claims extractClaims(String token) {
+    public Claims extractClaims(String token) throws JwtException {
         return Jwts.parser()
                 .verifyWith(secretKey())
                 .build()

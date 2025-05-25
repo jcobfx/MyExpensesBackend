@@ -1,5 +1,6 @@
 package pl.com.foks.myexpensesbackend.security.infrastructure;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,20 +31,23 @@ public class JwtFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            String username = jwtUtil.extractUsername(token);
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                User user = userService.findByUsername(username);
-                if (user != null && jwtUtil.validateToken(token, username)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            user,
-                            null,
-                            user.getRoles().stream()
-                                    .map(role -> new SimpleGrantedAuthority(role.getName()))
-                                    .collect(Collectors.toList())
-                    );
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+            try {
+                String token = authHeader.substring(7);
+                String username = jwtUtil.extractUsername(token);
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    User user = userService.findByUsername(username);
+                    if (user != null && jwtUtil.validateToken(token, username)) {
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                                user,
+                                null,
+                                user.getRoles().stream()
+                                        .map(role -> new SimpleGrantedAuthority(role.getName()))
+                                        .collect(Collectors.toList())
+                        );
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
                 }
+            } catch (JwtException ignored) {
             }
         }
         filterChain.doFilter(request, response);

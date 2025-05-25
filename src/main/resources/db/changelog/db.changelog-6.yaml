@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0
+      author: jcobfx
+      changes:
+        - modifyDataType:
+            tableName: financial_records
+            columnName: created_at
+            newDataType: timestamp without time zone
+
+        - modifyDataType:
+            tableName: refresh_tokens
+            columnName: expiry_date
+            newDataType: timestamp without time zone
+
+        - modifyDataType:
+            tableName: users
+            columnName: created_at
+            newDataType: timestamp without time zone
+
+  - changeSet:
+      id: 1
+      author: jcobfx
+      changes:
+        - addColumn:
+            tableName: financial_records
+            columns:
+              - column:
+                  name: title
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+        id: 2
+        author: jcobfx
+        changes:
+          - modifyDataType:
+              tableName: financial_records
+              columnName: value
+              newDataType: int
