@@ -1,4 +1,4 @@
-package pl.com.foks.myexpensesbackend.stripe.dto;
+package pl.com.foks.myexpensesbackend.payments.dto;
 
 public record CheckoutResponse(String paymentIntent, String ephemeralKey, String customerId, String stripePublicKey) {
 }

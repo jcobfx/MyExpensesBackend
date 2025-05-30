@@ -17,6 +17,12 @@ public class RoleService {
     private final RoleRepository roleRepository;
     private final UserService userService;
 
+    @Transactional(readOnly = true)
+    public Role getDefaultUserRole() {
+        return roleRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new RoleNotFoundException("Default user role not found"));
+    }
+
     @Transactional
     public void addRole(String role, String userUuid) {
         if (Objects.equals(role, "ROLE_ADMIN")) {

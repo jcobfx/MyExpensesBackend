@@ -23,13 +23,14 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(Base64.getUrlDecoder().decode(secret));
     }
 
-    public String generateToken(User user) {
+    public String generateToken(User user, String refreshToken) {
         Date now = new Date();
         Date expirationDate = new Date(now.getTime() + expiration * 60 * 1000);
 
         Map<String, Object> claims = new HashMap<>();
-//        claims.put("uuid", user.getUuid());
+        claims.put("refreshToken", refreshToken);
         claims.put("roles", user.getRoles());
+
         return Jwts.builder()
                 .header().type("JWT")
                 .and()

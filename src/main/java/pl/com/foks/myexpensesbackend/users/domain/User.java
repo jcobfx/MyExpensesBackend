@@ -18,26 +18,12 @@ import java.util.Set;
 @Builder
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique = true, nullable = false)
-    private Long id;
-
-    @Column(unique = true, nullable = false)
+    private long id;
     private String username;
-
-    @Column(nullable = false)
     private String password;
-
-    @Column(unique = true, nullable = false)
     private String email;
-
-    @Column(nullable = false)
     private LocalDateTime createdAt;
-
-    @Column(nullable = false)
     private boolean active;
-
-    @Column(unique = true, nullable = false)
     private String uuid;
 
     @ManyToMany(fetch = FetchType.EAGER)

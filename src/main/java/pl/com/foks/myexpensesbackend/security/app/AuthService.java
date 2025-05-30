@@ -8,6 +8,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.com.foks.myexpensesbackend.roles.app.RoleService;
+import pl.com.foks.myexpensesbackend.roles.domain.Role;
+import pl.com.foks.myexpensesbackend.security.domain.InvalidRefreshTokenException;
 import pl.com.foks.myexpensesbackend.security.domain.RefreshToken;
 import pl.com.foks.myexpensesbackend.security.domain.UserAlreadyExistsException;
 import pl.com.foks.myexpensesbackend.security.dto.AuthResponse;
@@ -16,6 +19,7 @@ import pl.com.foks.myexpensesbackend.users.app.UserService;
 import pl.com.foks.myexpensesbackend.users.domain.User;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -26,6 +30,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
 
     @Transactional
     public AuthResponse login(String username, String password) {
@@ -33,9 +38,9 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(username, password));
         if (auth.isAuthenticated()) {
             User user = (User) auth.getPrincipal();
-            String token = jwtUtil.generateToken(user);
             String refreshToken = refreshTokenService.createRefreshToken(username).getToken();
-            return new AuthResponse(token, refreshToken, false);
+            String token = jwtUtil.generateToken(user, refreshToken);
+            return new AuthResponse(token);
         } else {
             throw new BadCredentialsException("Invalid username or password");
         }
@@ -46,6 +51,7 @@ public class AuthService {
         if (userService.existsByUsernameOrEmail(username, email)) {
             throw new UserAlreadyExistsException("User with this username or email already exists");
         }
+        Role userRole = roleService.getDefaultUserRole();
         User user = User.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))
@@ -53,6 +59,7 @@ public class AuthService {
                 .createdAt(LocalDateTime.now())
                 .active(true)
                 .uuid(UUID.randomUUID().toString())
+                .roles(Set.of(userRole))
                 .build();
         return userService.save(user);
     }
@@ -64,10 +71,10 @@ public class AuthService {
                 .map(RefreshToken::getUser)
                 .map(user -> {
                     String username = user.getUsername();
-                    String token = jwtUtil.generateToken(user);
                     String refToken = refreshTokenService.createRefreshToken(username).getToken();
-                    return new AuthResponse(token, refToken, true);
+                    String token = jwtUtil.generateToken(user, refToken);
+                    return new AuthResponse(token);
                 })
-                .orElseThrow(() -> new BadCredentialsException("Invalid refresh token"));
+                .orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
     }
 }

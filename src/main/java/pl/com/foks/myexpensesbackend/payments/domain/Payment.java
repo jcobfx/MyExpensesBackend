@@ -1,4 +1,4 @@
-package pl.com.foks.myexpensesbackend.financial_records.domain;
+package pl.com.foks.myexpensesbackend.payments.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -11,12 +11,12 @@ import pl.com.foks.myexpensesbackend.users.domain.User;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "financial_records")
-@AllArgsConstructor
-@NoArgsConstructor
+@Table(name = "payments")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class FinancialRecord {
+public class Payment {
     @Id
     @JsonIgnore
     private long id;
@@ -26,9 +26,19 @@ public class FinancialRecord {
     @JsonIgnore
     private User user;
 
-    private String title;
-    private int value;
-    private String category;
+    private String paymentIntentId;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
     private LocalDateTime createdAt;
-    private String uuid;
+    private LocalDateTime updatedAt;
+
+    public enum Status {
+        PENDING,
+        CANCELLED,
+        SUCCEEDED,
+        FAILED
+    }
 }
+

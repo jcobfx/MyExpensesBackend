@@ -1,0 +1,66 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0
+      author: jcobfx
+      changes:
+        - createTable:
+            tableName: payments
+            columns:
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: payments_id_pk
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_payments_user_id
+                    references: users(id)
+              - column:
+                  name: payment_intent_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: status
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp without time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp without time zone
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 1
+      author: jcobfx
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: users_roles
+            constraintName: fk_role_name
+        - dropForeignKeyConstraint:
+            baseTableName: users_roles
+            constraintName: fk_user_id
+        - addForeignKeyConstraint:
+            baseTableName: users_roles
+            constraintName: fk_users_roles_user_id
+            referencedTableName: users
+            baseColumnNames: user_id
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableName: users_roles
+            constraintName: fk_users_roles_role_name
+            referencedTableName: roles
+            baseColumnNames: role_name
+            referencedColumnNames: name

@@ -37,10 +37,4 @@ public class GlobalExceptionHandler {
         log.severe("User already exists: " + e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exists: " + e.getMessage());
     }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleException(Exception e) {
-        log.severe("An error occurred: " + e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
-    }
 }
