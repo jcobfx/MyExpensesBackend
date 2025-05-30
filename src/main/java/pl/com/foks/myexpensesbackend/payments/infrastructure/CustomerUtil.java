@@ -1,4 +1,4 @@
-package pl.com.foks.myexpensesbackend.stripe.infrastructure;
+package pl.com.foks.myexpensesbackend.payments.infrastructure;
 
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
