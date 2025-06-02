@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 @Builder
 public class FinancialRecord {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
     private long id;
 

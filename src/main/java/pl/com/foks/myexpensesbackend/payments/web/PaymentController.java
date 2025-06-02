@@ -7,8 +7,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.com.foks.myexpensesbackend.payments.app.PaymentService;
 import pl.com.foks.myexpensesbackend.payments.domain.Payment;
-import pl.com.foks.myexpensesbackend.payments.dto.CheckoutRequest;
-import pl.com.foks.myexpensesbackend.payments.dto.CheckoutResponse;
+import pl.com.foks.myexpensesbackend.payments.dto.PaymentRequest;
+import pl.com.foks.myexpensesbackend.payments.dto.PaymentResponse;
 import pl.com.foks.myexpensesbackend.users.domain.User;
 
 import java.util.List;
@@ -24,10 +24,15 @@ public class PaymentController {
         return ResponseEntity.ok(paymentService.getPayments(user.getUsername()));
     }
 
-    @PostMapping("/checkout")
-    public ResponseEntity<CheckoutResponse> checkout(@AuthenticationPrincipal User user,
-                                                     @RequestBody CheckoutRequest checkoutRequest) throws StripeException {
-        return ResponseEntity.ok(paymentService.checkout(user.getUsername(), user.getEmail(), checkoutRequest));
+    @GetMapping("/public-key")
+    public ResponseEntity<String> getPublicKey() {
+        return ResponseEntity.ok(paymentService.getStripeApiPublic());
+    }
+
+    @PostMapping("/payment-intent")
+    public ResponseEntity<PaymentResponse> initiatePayment(@AuthenticationPrincipal User user,
+                                                    @RequestBody PaymentRequest paymentRequest) throws StripeException {
+        return ResponseEntity.ok(paymentService.initiatePayment(user.getUsername(), user.getEmail(), paymentRequest));
     }
 
     @PostMapping("/webhook")

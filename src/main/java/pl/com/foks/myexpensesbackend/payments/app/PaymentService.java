@@ -7,14 +7,15 @@ import com.stripe.net.Webhook;
 import com.stripe.param.EphemeralKeyCreateParams;
 import com.stripe.param.PaymentIntentCreateParams;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.com.foks.myexpensesbackend.payments.domain.Payment;
 import pl.com.foks.myexpensesbackend.payments.domain.PaymentRepository;
-import pl.com.foks.myexpensesbackend.payments.dto.CheckoutRequest;
-import pl.com.foks.myexpensesbackend.payments.dto.CheckoutResponse;
+import pl.com.foks.myexpensesbackend.payments.dto.PaymentRequest;
+import pl.com.foks.myexpensesbackend.payments.dto.PaymentResponse;
 import pl.com.foks.myexpensesbackend.payments.infrastructure.CustomerUtil;
 import pl.com.foks.myexpensesbackend.users.app.UserService;
 
@@ -32,6 +33,7 @@ public class PaymentService {
     private String stripeApiSecret;
 
     @Value("${stripe.keys.api-public}")
+    @Getter
     private String stripeApiPublic;
 
     @Value("${stripe.keys.webhook-secret}")
@@ -51,7 +53,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public CheckoutResponse checkout(String username, String email, CheckoutRequest checkoutRequest) throws StripeException {
+    public PaymentResponse initiatePayment(String username, String email, PaymentRequest paymentRequest) throws StripeException {
         Customer customer = customerUtil.findOrCreateCustomer(email, username);
 
         EphemeralKeyCreateParams ephemeralKeyCreateParams = EphemeralKeyCreateParams.builder()
@@ -60,7 +62,7 @@ public class PaymentService {
                 .build();
         EphemeralKey ephemeralKey = EphemeralKey.create(ephemeralKeyCreateParams);
 
-        Price price = Price.retrieve(Product.retrieve(checkoutRequest.productId()).getDefaultPrice());
+        Price price = Price.retrieve(Product.retrieve(paymentRequest.productId()).getDefaultPrice());
 
         PaymentIntentCreateParams paymentIntentCreateParams = PaymentIntentCreateParams.builder()
                 .setAmount(price.getUnitAmount())
@@ -75,20 +77,20 @@ public class PaymentService {
         PaymentIntent paymentIntent = PaymentIntent.create(paymentIntentCreateParams);
 
         String id = paymentIntent.getId();
+        LocalDateTime now = LocalDateTime.now();
         Payment payment = Payment.builder()
                 .user(userService.findByUsername(username))
                 .paymentIntentId(id)
                 .status(Payment.Status.PENDING)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(now)
+                .updatedAt(now)
                 .build();
         paymentRepository.save(payment);
 
-        return new CheckoutResponse(
+        return new PaymentResponse(
                 paymentIntent.getClientSecret(),
                 ephemeralKey.getSecret(),
-                customer.getId(),
-                stripeApiPublic
+                customer.getId()
         );
     }
 

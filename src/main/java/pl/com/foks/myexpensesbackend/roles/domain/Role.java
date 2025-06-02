@@ -17,7 +17,6 @@ import java.util.Set;
 @Builder
 public class Role {
     @Id
-    @Column(unique = true, nullable = false)
     private String name;
 
     @ManyToMany(mappedBy = "roles")
