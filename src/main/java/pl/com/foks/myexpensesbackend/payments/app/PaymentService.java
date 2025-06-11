@@ -73,19 +73,9 @@ public class PaymentService {
                                 .setEnabled(true)
                                 .build()
                 )
+                .putMetadata("user_uuid", userService.findByUsername(username).getUuid())
                 .build();
         PaymentIntent paymentIntent = PaymentIntent.create(paymentIntentCreateParams);
-
-        String id = paymentIntent.getId();
-        LocalDateTime now = LocalDateTime.now();
-        Payment payment = Payment.builder()
-                .user(userService.findByUsername(username))
-                .paymentIntentId(id)
-                .status(Payment.Status.PENDING)
-                .createdAt(now)
-                .updatedAt(now)
-                .build();
-        paymentRepository.save(payment);
 
         return new PaymentResponse(
                 paymentIntent.getClientSecret(),
@@ -104,10 +94,22 @@ public class PaymentService {
             throw new RuntimeException("Invalid webhook signature", e);
         }
         switch (event.getType()) {
-            case "payment_intent.created" -> {
-//                StripeObject data = event.getDataObjectDeserializer().getObject().orElseThrow();
-//                String paymentIntentId = ((PaymentIntent) data).getId();
-                // TODO: Handle payment intent creation if needed
+            case "payment_intent.requires_action" -> {
+                StripeObject data = event.getDataObjectDeserializer().getObject().orElseThrow();
+                PaymentIntent paymentIntent = (PaymentIntent) data;
+                String paymentIntentId = paymentIntent.getId();
+                String userUuid = paymentIntent.getMetadata().get("user_uuid");
+                if (paymentIntentId != null && userUuid != null && !userUuid.isBlank()) {
+                    LocalDateTime now = LocalDateTime.now();
+                    Payment payment = Payment.builder()
+                            .user(userService.findByUuid(userUuid))
+                            .paymentIntentId(paymentIntentId)
+                            .status(Payment.Status.PENDING)
+                            .createdAt(now)
+                            .updatedAt(now)
+                            .build();
+                    paymentRepository.save(payment);
+                }
             }
             case "payment_intent.succeeded" -> {
                 StripeObject data = event.getDataObjectDeserializer().getObject().orElseThrow();
@@ -132,19 +134,6 @@ public class PaymentService {
                                 payment.setUpdatedAt(LocalDateTime.now());
                                 paymentRepository.save(payment);
                                 // TODO: Handle failed payment, e.g., notify user
-                            });
-                }
-            }
-            case "payment_intent.canceled" -> {
-                StripeObject data = event.getDataObjectDeserializer().getObject().orElseThrow();
-                String paymentIntentId = ((PaymentIntent) data).getId();
-                if (paymentIntentId != null) {
-                    paymentRepository.findByPaymentIntentId(paymentIntentId)
-                            .ifPresent(payment -> {
-                                payment.setStatus(Payment.Status.CANCELLED);
-                                payment.setUpdatedAt(LocalDateTime.now());
-                                paymentRepository.save(payment);
-                                // TODO: Handle cancelled payment, e.g., notify user
                             });
                 }
             }
