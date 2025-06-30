@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0
+      author: jcobfx
+      changes:
+        - createTable:
+            tableName: "categories"
+            columns:
+              - column:
+                  name: "name"
+                  type: "varchar(50)"
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: "category_pk"
+        - insert:
+            tableName: "categories"
+            columns:
+              - column:
+                  name: "name"
+                  value: "Food"
+              - column:
+                  name: "name"
+                  value: "Alcohol"
+  - changeSet:
+      id: 1
+      author: jcobfx
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: "financial_records"
+            baseColumnNames: "category"
+            constraintName: "fk_financial_records_category"
+            referencedTableName: "categories"
+            referencedColumnNames: "name"
+  - changeSet:
+      id: 2
+      author: jcobfx
+      changes:
+        - dropPrimaryKey:
+            tableName: "payments"
+            constraintName: "payments_pkey"
+        - addPrimaryKey:
+            tableName: "payments"
+            columnNames: "id"
+            constraintName: "payments_pk"
+        - dropForeignKeyConstraint:
+            baseTableName: "financial_records"
+            constraintName: "fk_user_id"
+        - addForeignKeyConstraint:
+            baseTableName: "financial_records"
+            baseColumnNames: "user_id"
+            constraintName: "fk_financial_records_user_id"
+            referencedTableName: "users"
+            referencedColumnNames: "id"

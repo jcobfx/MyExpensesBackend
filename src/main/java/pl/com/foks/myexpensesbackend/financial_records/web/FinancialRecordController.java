@@ -6,9 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.com.foks.myexpensesbackend.financial_records.app.FinancialRecordService;
+import pl.com.foks.myexpensesbackend.financial_records.domain.Category;
+import pl.com.foks.myexpensesbackend.financial_records.domain.CategoryRepository;
 import pl.com.foks.myexpensesbackend.financial_records.domain.FinancialRecord;
 import pl.com.foks.myexpensesbackend.users.domain.User;
 
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -16,6 +19,13 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class FinancialRecordController {
     private final FinancialRecordService financialRecordService;
+    private final CategoryRepository categoryRepository;
+
+    @GetMapping("/categories")
+    public ResponseEntity<List<Category>> getCategories() {
+        List<Category> categories = categoryRepository.findAll();
+        return ResponseEntity.ok(categories);
+    }
 
     @GetMapping
     public ResponseEntity<Set<FinancialRecord>> getFinancialRecords(@AuthenticationPrincipal User user) {
@@ -26,6 +36,9 @@ public class FinancialRecordController {
     @PutMapping
     public ResponseEntity<FinancialRecord> createFinancialRecord(@AuthenticationPrincipal User user,
                                                                  @RequestBody FinancialRecord financialRecord) {
+        if (financialRecord.getCategory() == null) {
+            return ResponseEntity.badRequest().body(financialRecord);
+        }
         financialRecord.setUser(user);
         FinancialRecord createdFinancialRecord = financialRecordService.createFinancialRecord(financialRecord);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdFinancialRecord);

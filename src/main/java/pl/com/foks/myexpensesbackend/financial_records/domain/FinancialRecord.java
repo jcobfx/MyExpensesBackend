@@ -29,7 +29,11 @@ public class FinancialRecord {
 
     private String title;
     private int value;
-    private String category;
+
+    @ManyToOne
+    @JoinColumn(name = "category")
+    private Category category;
+
     private LocalDateTime createdAt;
     private String uuid;
 }
