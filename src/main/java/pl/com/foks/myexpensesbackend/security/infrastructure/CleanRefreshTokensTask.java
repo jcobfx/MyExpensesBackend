@@ -20,10 +20,10 @@ public class CleanRefreshTokensTask {
         refreshTokenRepository.deleteAllByExpiryDateBefore(LocalDateTime.now().minusDays(7));
     }
 
-    @Scheduled(cron = "0 */5 * * * *")
+    @Scheduled(cron = "0 */2 * * * *")
     @Transactional
     @Profile("local")
     public void cleanRefreshTokensForLocal() {
-        refreshTokenRepository.deleteAllByExpiryDateBefore(LocalDateTime.now().minusMinutes(5));
+        refreshTokenRepository.deleteAllByExpiryDateBefore(LocalDateTime.now().minusMinutes(2));
     }
 }

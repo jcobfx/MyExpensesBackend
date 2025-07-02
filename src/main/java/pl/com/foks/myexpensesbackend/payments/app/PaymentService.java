@@ -17,7 +17,9 @@ import pl.com.foks.myexpensesbackend.payments.domain.PaymentRepository;
 import pl.com.foks.myexpensesbackend.payments.dto.PaymentRequest;
 import pl.com.foks.myexpensesbackend.payments.dto.PaymentResponse;
 import pl.com.foks.myexpensesbackend.payments.infrastructure.CustomerUtil;
+import pl.com.foks.myexpensesbackend.roles.app.RoleService;
 import pl.com.foks.myexpensesbackend.users.app.UserService;
+import pl.com.foks.myexpensesbackend.users.domain.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,6 +30,7 @@ public class PaymentService {
     private final CustomerUtil customerUtil;
     private final PaymentRepository paymentRepository;
     private final UserService userService;
+    private final RoleService roleService;
 
     @Value("${stripe.keys.api-secret}")
     private String stripeApiSecret;
@@ -94,7 +97,7 @@ public class PaymentService {
             throw new RuntimeException("Invalid webhook signature", e);
         }
         switch (event.getType()) {
-            case "payment_intent.requires_action" -> {
+            case "payment_intent.created" -> {
                 StripeObject data = event.getDataObjectDeserializer().getObject().orElseThrow();
                 PaymentIntent paymentIntent = (PaymentIntent) data;
                 String paymentIntentId = paymentIntent.getId();
@@ -120,7 +123,10 @@ public class PaymentService {
                                 payment.setStatus(Payment.Status.SUCCEEDED);
                                 payment.setUpdatedAt(LocalDateTime.now());
                                 paymentRepository.save(payment);
-                                // TODO: Handle successful payment, e.g., update user subscription status
+
+                                User user = userService.findByUsername(payment.getUser().getUsername());
+                                user.getRoles().add(roleService.findByName("ROLE_PREMIUM"));
+                                userService.save(user);
                             });
                 }
             }
