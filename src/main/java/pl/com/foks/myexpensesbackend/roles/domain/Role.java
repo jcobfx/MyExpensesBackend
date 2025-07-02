@@ -5,9 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pl.com.foks.myexpensesbackend.users.domain.User;
-
-import java.util.Set;
 
 @Entity
 @Table(name = "roles")
@@ -18,7 +15,4 @@ import java.util.Set;
 public class Role {
     @Id
     private String name;
-
-    @ManyToMany(mappedBy = "roles")
-    private Set<User> users;
 }

@@ -17,12 +17,6 @@ import pl.com.foks.myexpensesbackend.users.domain.UserNotFoundException;
 @Log
 @Profile("local")
 public class GlobalExceptionHandler {
-    @ExceptionHandler({AuthenticationException.class, JwtException.class})
-    public ResponseEntity<String> handleAuthenticationException(Exception e) {
-        log.severe("Authentication error: " + e.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication error: " + e.getMessage());
-    }
-
     @ExceptionHandler(exception = {
             FinancialRecordNotFoundException.class,
             RoleNotFoundException.class,

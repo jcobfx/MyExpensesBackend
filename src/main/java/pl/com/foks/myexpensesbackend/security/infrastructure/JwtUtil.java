@@ -25,7 +25,7 @@ public class JwtUtil {
 
     public String generateToken(User user, String refreshToken) {
         Date now = new Date();
-        Date expirationDate = new Date(now.getTime() + expiration * 60 * 1000);
+        Date expirationDate = new Date(now.getTime() + expiration * 1000);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("refreshToken", refreshToken);
