@@ -10,6 +10,6 @@ import java.util.Optional;
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
     Optional<RefreshToken> findByToken(String token);
     @Modifying
-    @Query("delete from RefreshToken rt where rt.expiryDate < :date")
+    @Query("delete from RefreshToken rt where rt.expiresAt < :date")
     void deleteAllByExpiryDateBefore(LocalDateTime date);
 }

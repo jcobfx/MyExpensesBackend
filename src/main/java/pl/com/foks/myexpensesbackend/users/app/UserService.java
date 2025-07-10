@@ -7,10 +7,17 @@ import pl.com.foks.myexpensesbackend.users.domain.User;
 import pl.com.foks.myexpensesbackend.users.domain.UserNotFoundException;
 import pl.com.foks.myexpensesbackend.users.domain.UserRepository;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+
+    @Transactional(readOnly = true)
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
 
     @Transactional(readOnly = true)
     public User findByUsername(String username) {

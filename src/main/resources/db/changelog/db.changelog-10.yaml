@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0
+      author: jcobfx
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: premium_expiration_date
+                  type: "timestamp without time zone"
+  - changeSet:
+      id: 1
+      author: jcobfx
+      changes:
+        - modifyDataType:
+            tableName: financial_records
+            columnName: created_at
+            newDataType: "timestamp without time zone"
+        - modifyDataType:
+            tableName: payments
+            columnName: created_at
+            newDataType: "timestamp without time zone"
+        - modifyDataType:
+            tableName: payments
+            columnName: updated_at
+            newDataType: "timestamp without time zone"
+        - modifyDataType:
+            tableName: refresh_tokens
+            columnName: expiry_date
+            newDataType: "timestamp without time zone"
+        - modifyDataType:
+            tableName: users
+            columnName: created_at
+            newDataType: "timestamp without time zone"
+
+  - changeSet:
+      id: 2
+      author: jcobfx
+      changes:
+        - renameColumn:
+            tableName: refresh_tokens
+            oldColumnName: expiry_date
+            newColumnName: expires_at

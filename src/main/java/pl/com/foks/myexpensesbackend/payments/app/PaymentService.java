@@ -126,6 +126,7 @@ public class PaymentService {
 
                                 User user = userService.findByUsername(payment.getUser().getUsername());
                                 user.getRoles().add(roleService.findByName("ROLE_PREMIUM"));
+                                user.setPremiumExpirationDate(LocalDateTime.now().plusMonths(1));
                                 userService.save(user);
                             });
                 }

@@ -27,6 +27,7 @@ public class User {
     private LocalDateTime createdAt;
     private boolean active;
     private String uuid;
+    private LocalDateTime premiumExpirationDate;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",

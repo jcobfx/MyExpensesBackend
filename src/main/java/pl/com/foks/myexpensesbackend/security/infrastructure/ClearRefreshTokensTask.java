@@ -11,19 +11,19 @@ import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
-public class CleanRefreshTokensTask {
+public class ClearRefreshTokensTask {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Scheduled(cron = "@weekly")
     @Transactional
-    public void cleanRefreshTokens() {
+    public void clearRefreshTokens() {
         refreshTokenRepository.deleteAllByExpiryDateBefore(LocalDateTime.now().minusDays(7));
     }
 
     @Scheduled(cron = "0 */2 * * * *")
     @Transactional
     @Profile("local")
-    public void cleanRefreshTokensForLocal() {
+    public void clearRefreshTokensForLocal() {
         refreshTokenRepository.deleteAllByExpiryDateBefore(LocalDateTime.now().minusMinutes(2));
     }
 }

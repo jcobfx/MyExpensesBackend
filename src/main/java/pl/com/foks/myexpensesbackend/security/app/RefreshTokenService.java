@@ -27,7 +27,7 @@ public class RefreshTokenService {
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(userService.findByUsername(username))
                 .token(UUID.randomUUID().toString())
-                .expiryDate(LocalDateTime.now().plusSeconds(expiration))
+                .expiresAt(LocalDateTime.now().plusSeconds(expiration))
                 .build();
         return refreshTokenRepository.save(refreshToken);
     }
@@ -39,7 +39,7 @@ public class RefreshTokenService {
 
     @Transactional
     public RefreshToken verifyExpiration(RefreshToken token){
-        if(token.getExpiryDate().isBefore(LocalDateTime.now())){
+        if(token.getExpiresAt().isBefore(LocalDateTime.now())){
             refreshTokenRepository.delete(token);
             throw new RefreshTokenExpiredException(token.getToken() + " Refresh token is expired. Please make a new login..!");
         }

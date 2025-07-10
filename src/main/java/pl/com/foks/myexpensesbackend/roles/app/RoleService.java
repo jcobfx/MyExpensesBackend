@@ -9,6 +9,7 @@ import pl.com.foks.myexpensesbackend.roles.domain.RoleRepository;
 import pl.com.foks.myexpensesbackend.users.app.UserService;
 import pl.com.foks.myexpensesbackend.users.domain.User;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service
@@ -51,5 +52,16 @@ public class RoleService {
                 .orElseThrow(() -> new RoleNotFoundException("Role not found with name: " + role));
         user.getRoles().remove(roleEntity);
         userService.save(user);
+    }
+
+    @Transactional
+    public void clearExpiredPremiumRoles() {
+        userService.findAll().forEach(u -> {
+            if (u.getPremiumExpirationDate() != null && u.getPremiumExpirationDate().isBefore(LocalDateTime.now())) {
+                u.getRoles().removeIf(role -> role.getName().equals("ROLE_PREMIUM"));
+                u.setPremiumExpirationDate(null);
+                userService.save(u);
+            }
+        });
     }
 }
